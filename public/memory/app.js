@@ -9,7 +9,7 @@ export async function mount(){
   const canvas=$('#drawing'),ctx=canvas.getContext('2d');
   const saved=storage.get('memory-draft');if(saved?.target===target&&Array.isArray(saved.strokes))strokes=saved.strokes.slice(0,100);
   function paint(){ctx.fillStyle='#fff';ctx.fillRect(0,0,600,600);ctx.lineCap='round';ctx.lineJoin='round';for(const stroke of strokes){ctx.strokeStyle=stroke.color;ctx.lineWidth=stroke.color==='#ffffff'?28:5;ctx.beginPath();stroke.points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));if(stroke.points.length===1){const [x,y]=stroke.points[0];ctx.lineTo(x+.1,y+.1);}ctx.stroke();}}
-  function persist(){storage.set('memory-draft',{target,strokes});}
+  function persist(){storage.set('memory-draft',{target,strokes,running,deadlineWall:running?Date.now()+Math.max(0,deadline-performance.now()):null,finished});}
   function stop(){if(!running)return;running=false;active=null;finished=true;clearInterval(ticker);$('#timer').textContent='Готово';$('#finish').disabled=true;$('#finish').dataset.lock='true';$('#target').disabled=false;$('#start').textContent='Попробовать ещё раз';$('#start').dataset.lock='false';$('#start').disabled=false;$('#reveal').hidden=false;$('#reference').innerHTML=targets[target].svg;persist();}
   function clock(){const left=Math.max(0,deadline-performance.now());$('#timer').textContent=`00:${String(Math.ceil(left/1000)).padStart(2,'0')}`;if(left<=0)stop();}
   function point(e){const rect=canvas.getBoundingClientRect();return [Math.max(0,Math.min(600,(e.clientX-rect.left)*600/rect.width)),Math.max(0,Math.min(600,(e.clientY-rect.top)*600/rect.height))];}
@@ -27,5 +27,11 @@ export async function mount(){
   action($('#save'),()=>{if(finished)download(canvas,'memory-sketch.png');});
   action($('#challenge'),()=>share(`${location.origin}/memory/?draw=${target}`,'По памяти',`Попробуй нарисовать ${targets[target].name} за 30 секунд!`));
   document.addEventListener('visibilitychange',()=>{if(running)clock();});
+  window.addEventListener('minute:preferences-changing',persist);
   window.addEventListener('pagehide',()=>{clearInterval(ticker);persist();});paint();
+  if(saved?.target===target && saved.running && Number.isFinite(saved.deadlineWall)){
+    running=true;deadline=performance.now()+Math.max(0,saved.deadlineWall-Date.now());
+    $('#target').disabled=true;$('#start').dataset.lock='true';$('#start').disabled=true;$('#finish').disabled=false;
+    clock();if(running)ticker=setInterval(clock,100);
+  }else if(saved?.target===target && saved.finished){running=true;stop();}
 }
