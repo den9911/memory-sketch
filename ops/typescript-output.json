@@ -1,0 +1,4 @@
+{
+  "preferences-model.js": "public/shared/preferences-model.js",
+  "preferences.js": "public/shared/preferences.js"
+}
