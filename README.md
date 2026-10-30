@@ -22,7 +22,7 @@ Draw an everyday object from memory, reveal the reference, and save your version
 
 ## Features
 
-- Four reference objects and a 30-second timer
+- Fourteen reference objects and a 30-second timer
 - Pen colors, eraser, and undo
 - Local PNG export and shareable object challenges
 
@@ -57,7 +57,7 @@ With Node.js 24+: `npm test` and `npm run check`.
 
 Upload the contents of `public/` to your static host. Absolute asset paths assume a domain root; a GitHub Pages project subpath requires adapting paths or using a custom domain. Drawings and preferences stay on the device. Clearing site data removes drafts. Exported PNG files are created locally.
 
-Four reference objects, a 30-second timer, pen colors, eraser, undo, PNG export, and shareable object challenges. Automatic recognition is not used. The canvas supports mouse and touch; drawing itself requires a pointing device.
+Fourteen reference objects, a 30-second timer, pen colors, eraser, undo, PNG export, and shareable object challenges. Automatic recognition is not used. The canvas supports mouse and touch; drawing itself requires a pointing device.
 
 ## Develop with TypeScript
 

@@ -1,6 +1,8 @@
 import { $, $$, action, download, share, storage } from '/locales/ru/shared/ui.js';
 import { sceneSvg } from '/locales/ru/shared/scenes.js';
+import { extraTargets } from '/locales/ru/memory/extra.js';
 const targets=[{name:'велосипед',svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 430" role="img" aria-label="Велосипед"><rect width="600" height="430" fill="#e7eddf"/><g fill="none" stroke="#2b302b" stroke-width="8" stroke-linejoin="round"><circle cx="160" cy="290" r="85"/><circle cx="440" cy="290" r="85"/><path d="M160 290l90-140 80 140H160l50-105h185l45 105m-110 0l65-105-25-60h-50m-90 25h45"/></g></svg>'},{name:'кота',svg:sceneSvg(3)},{name:'кружку',svg:sceneSvg(4)},{name:'растение в горшке',svg:sceneSvg(2)}];
+targets.push(...extraTargets);
 export async function mount(){
   const requested=Number(new URLSearchParams(location.search).get('draw'));
   let target=Number.isInteger(requested)&&requested>=0&&requested<targets.length?requested:0;
@@ -25,7 +27,7 @@ export async function mount(){
   action($('#finish'),stop);
   $('#target').addEventListener('change',()=>{target=Number($('#target').value);$('#instruction').textContent=`Нарисуй ${targets[target].name}`;strokes=[];finished=false;$('#reveal').hidden=true;$('#timer').textContent='00:30';history.replaceState(null,'',`?draw=${target}`);paint();});
   action($('#save'),()=>{if(finished)download(canvas,'memory-sketch.png');});
-  action($('#challenge'),()=>share(`${location.origin}/memory/?draw=${target}`,'По памяти',`Попробуй нарисовать ${targets[target].name} за 30 секунд!`));
+  action($('#challenge'),()=>{const url=new URL(location.href);url.searchParams.set('draw',String(target));share(url.href,'По памяти',`Попробуй нарисовать ${targets[target].name} за 30 секунд!`);});
   document.addEventListener('visibilitychange',()=>{if(running)clock();});
   window.addEventListener('minute:preferences-changing',persist);
   window.addEventListener('pagehide',()=>{clearInterval(ticker);persist();});paint();
